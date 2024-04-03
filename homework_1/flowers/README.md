@@ -1,20 +1,30 @@
-## 8-th March flowers problem
+# Formalization
 
-### Formalization
+Let's assume that couriers can't go back to the shop during a day when they are out of flowers for some clients and they need to go back to end up their working day. Also, each client should be visited only once. As our matrix satisfy the triangle inequality, the distance between each two points is shortest one. It means that couriers optimal strategy is to visit only those points, which demands still exist. Let's provide some definitions.
 
-Let's assume that couriers can't go back to the shop during a day when they are out of flowers for some clients. Let's also assume that there is no need for couriers to go back to the shop when there is no work for them. As our matrix satisfy the triangle inequality, the distance between each two points is shortest one. It means that couriers optimal strategy is to visit only those points, which demands still exist.
 
-Let's $\displaystyle p_{i} =\left( p_{i}^0,p_{i}^{1} ,p_{i}^{2} ,\dotsc ,p_{i}^{k_{i}}\right) ,i\in \{1,\dotsc ,h\}$, where $\displaystyle h$ is the number of couriers and $p_{i}^0=0$ for every $i$, be the path of $\displaystyle i$-th courier. These paths also have constraint $\sum _{j=1}^{k_{i}} p_{i}^{j} \leqslant c_{i} ,$
-where $\displaystyle c_{j}$ is the capacity of courier $\displaystyle c_{j}$. The every feasible solution looks like splitting $\displaystyle p_{1} ,\dotsc ,p_{h}$ of initial verticies $\displaystyle \{1,2,\dotsc ,n\}$ such that $\displaystyle \bigcup _{i=1}^{h} p_{i} \backslash \{0\} =\{1,2,\dotsc ,n\}$ and $\displaystyle \forall i,j\in \{1,2,\dotsc ,h\} ,i\neq j\hookrightarrow p_{i} \cap p_{j} =\{0\}$, which also satisfy condition written above. The cost of the solutions is $m^* = \sum_{i=1}^h\sum_{j=1}^{k_i}d_{p_{j-1}}^{p_j}\cdot s_i$, where $d_{p_{j-1}}^{p_j}$ is the distance between $p_{j-1}$ and ${p_j}$, $s_i$ is the salary of courier $i$. The optimal solution is such feasible solution which cost is minimal.
 
-## Proposed solution
+Let's $\displaystyle p_{i} =\left( p^{0} ,p_{i}^{1} ,\dotsc ,p_{i}^{t_{i}}\right) ,i\in \{1,\dotsc c\}$ be the paths of couriers, where $\displaystyle c$ is the total number of couriers, $\displaystyle p_{i}^{j}$ is the point visited by courier $\displaystyle i$ in timestamp $\displaystyle j$ and $\displaystyle p^{0} \equiv 0$. $\displaystyle m_{i}^{j}$ is the distance between points $\displaystyle i$ and $\displaystyle j$, $\displaystyle s_{i}$ is the salary of $\displaystyle i$-th courier. $\displaystyle d_{j} ,\ j\in \{1,\dotsc ,N\}$ is the demand of $\displaystyle j$-th point, $\displaystyle N$ is the total number of points and $\displaystyle l_{i}$ is the capacity of $\displaystyle i$-th courier. Let's also define the set of feasible solutions $\displaystyle S$ containing vectors $\displaystyle \overline{p} =( p_{i} ,\dotsc ,p_{c})$ which satisfy conditions
 
-1) Iterate over all feasible solutions by bruteforce. Its time complexity is $O(2^{n+4})=O(2^n)$ because we have $n$ points and $4$ couriers.
+1. $\displaystyle \sum _{j=1}^{t_{i}} d_{p_{i}^{j}} \leqslant l_{i} ,\ \forall i\in \{1,\dotsc ,c\}$ which means that courier can fulfill demands of all points which he visit,
 
-2) Find the optimal in terms of distance Hamilton paths on the fully connected graphs $\displaystyle \left\{p_i^0,p_{i}^{1} ,\dotsc p_{i}^{k_{i}}\right\}$ for each $\displaystyle i\in \{1,\dotsc ,h\}$. We can do that by using the breadth-first search.
+2. $\displaystyle \forall j\in \{1,\dotsc ,N\} \ d_{j}  >0\Rightarrow \ \exists i\in \{1,\dotsc ,c\} :\ j\in p_{i}$ which means that for non-zero demand points exists courier which will visit this point.
+
+So, our task is to find $\displaystyle \min_{\overline{p} \in S}\sum _{i=1}^{c}\left(\sum _{j=1}^{t_{i}} m_{p_{i}^{j-1}}^{p_{i}^{j}} \cdotp s_{i}\right) +m_{p_{i}^{t_{i}}}^{p^{0}} \cdotp s_{i}$.
+
+# Proposed solution
+As the task is NP-complete, I propose to use genetic algorithm to find the suboptimal solution.
+
+1. Generate population from the set of feasible solutions randomly and find cost for each of these.
+2. Select "elite" set of solutions and crossover them to create offsprings,
+3. Mutate offsprings and add them to elite ones to create a new population
+4. Sample some random solutions once again and mix them to the new popultaion.
+5. Repeat until convergence of minimal cost inside population.
 
 # Solutions
+My algorithm gave these solutions
+## A
+`Solution(paths=[[5, 8, 6, 2, 10, 16], [12, 11, 15, 13], [3, 4, 1, 7], [9, 14]])` -- cost 6,392
 
-- Solution(paths=[[7, 4, 3, 15, 11, 12, 13], [8, 2, 6, 5], [9, 10, 16, 14], [1, 7]], loads=[[400, 400, 200, 800, 100, 200, 400], [800, 100, 400, 200], [100, 200, 800, 400], [100, 400]]) -- cost 6392
-- Solution(paths=[[9, 14, 16, 10, 2, 6, 8], [12, 11, 15, 13], [7, 1, 4, 3, 5, 8], [7]], loads=[[100, 400, 800, 200, 100, 400, 500], [200, 100, 800, 400], [300, 100, 400, 200, 200, 300], [500]]) -- cost 6140.0
-- Solution(paths=[[9, 14, 16, 10, 2, 6, 8], [3, 4, 1, 7], [12, 11, 15, 13], [8, 5]], loads=[[100, 400, 800, 200, 100, 400, 500], [200, 400, 100, 800], [200, 100, 800, 400], [300, 200]]) -- cost 6072.0
+## B
+`Solution(paths=[[7, 1, 4, 3, 15, 12], [9, 14, 16, 10, 2, 6], [8, 5], [11, 13]])` -- cost 5,264

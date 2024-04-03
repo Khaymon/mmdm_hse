@@ -203,6 +203,8 @@ class Optimizer:
         populations = [self._create_population(task, self._population_size) for _ in range(self._n_populations)]
 
         bar = tqdm(range(self._n_iterations))
+        result = None
+        global_min = None
         for _ in bar:
             sorted_cost_genes = [
                 sorted(population, key=lambda gene: gene.cost(task)) for population in populations
@@ -215,22 +217,34 @@ class Optimizer:
                 min(population_elite_genes, key=lambda gene: gene.cost(task)).cost(task)
                 for population_elite_genes in elite_genes
             )
-            bar.set_description(f"Min cost: {min_cost}")
 
-            offsprings = self._create_offsprings(elite_genes, task, self._n_offsprings)
-            mutated_offsprings = self._mutate_offsprings(offsprings, task)
+            if global_min is None or min_cost < global_min:
+                global_min = min_cost
+                found = False
+                for population in populations:
+                    for gene in population:
+                        if gene.cost(task) == global_min:
+                            result = gene
+                            found = True
+                            break
+                    if found:
+                        break
+                if not found:
+                    raise RuntimeError(f"Unable to find best gene with cost {global_min}")
+                     
+            bar.set_description(f"Min cost: {result.cost(task)}")
+
+            offsprings = self._create_offsprings(deepcopy(elite_genes), task, self._n_offsprings)
+            mutated = [
+                self._mutate_offsprings(deepcopy(population_elites + offsprings), task) for population_elites in elite_genes
+            ]
             random_genes = [self._create_population(task, self._n_random) for _ in range(self._n_populations)]
 
             populations = [
-                elite_population_genes + mutated_offsprings + random_population_genes
-                for elite_population_genes, random_population_genes in zip(elite_genes, random_genes)]
+                set(population_elites + population_mutated + random_population_genes)
+                for population_elites, population_mutated, random_population_genes in zip(elite_genes, mutated, random_genes)]
 
-        for population_genes in elite_genes:
-            for gene in population_genes:
-                if gene.cost(task) == min_cost:
-                    return gene
-
-        raise RuntimeError(f"Unable to find the best solution")
+        return result
 
 
 def main():

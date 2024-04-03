@@ -3,6 +3,8 @@ from collections import defaultdict
 import itertools
 import typing as T
 
+import numpy as np
+
 import flowers_data as data
 
 
@@ -59,7 +61,7 @@ class Solution:
     def is_feasible(self, task: data.Task) -> bool:
         assert len(self.paths) == task.n_couriers
         assert len(self.paths) == len(task.max_loads)
-
+            
         if not self.check_capacities(task.max_loads):
             return False
         if not self.check_paths(task.n_points):
@@ -69,8 +71,18 @@ class Solution:
 
         return True
 
+    def unique_visitors(self) -> bool:
+        used = set()
+        for path in self.paths:
+            if used.intersection(path):
+                return False
+            used.update(path)
+
+        return True
+
     def cost(self, task: data.Task) -> float:
-        assert self.is_feasible(task)
+        if not self.unique_visitors():
+            return np.inf
 
         cost = 0
         for path, salary in zip(self.paths, task.salaries):
@@ -105,3 +117,10 @@ class Solution:
 
             self.paths[courier] = list(min_path)
             self.loads[courier] = list(result_loads)
+
+    def __hash__(self) -> int:
+        current_hash = 0
+        for path in self.paths:
+            current_hash += hash(tuple(path))
+
+        return current_hash
