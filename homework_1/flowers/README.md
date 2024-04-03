@@ -4,11 +4,11 @@ Let's assume that couriers can't go back to the shop during a day when they are 
 
 
 
-Let's $\displaystyle p_{i} =\left( p^{0} ,p_{i}^{1} ,\dotsc ,p_{i}^{t_{i}}\right) ,i\in \{1,\dotsc c\}$ be the paths of couriers, where $\displaystyle c$ is the total number of couriers, $\displaystyle p_{i}^{j}$ is the point visited by courier $\displaystyle i$ in timestamp $\displaystyle j$ and $\displaystyle p^{0} \equiv 0$. $\displaystyle m_{i}^{j}$ is the distance between points $\displaystyle i$ and $\displaystyle j$, $\displaystyle s_{i}$ is the salary of $\displaystyle i$-th courier. $\displaystyle d_{j} ,\ j\in \{1,\dotsc ,N\}$ is the demand of $\displaystyle j$-th point, $\displaystyle N$ is the total number of points and $\displaystyle l_{i}$ is the capacity of $\displaystyle i$-th courier. Let's also define the set of feasible solutions $\displaystyle S$ containing vectors $ \overline{p} =( p_{i} ,\dotsc ,p_{c})$ which satisfy conditions
+Let's $\displaystyle p_{i} =\left( p^{0} ,p_{i}^{1} ,\dotsc ,p_{i}^{t_{i}}\right) ,i\in \{1,\dotsc c\}$ be the paths of couriers, where $\displaystyle c$ is the total number of couriers, $\displaystyle p_{i}^{j}$ is the point visited by courier $\displaystyle i$ in timestamp $\displaystyle j$ and $\displaystyle p^{0} \equiv 0$. $\displaystyle m_{i}^{j}$ is the distance between points $\displaystyle i$ and $\displaystyle j$, $\displaystyle s_{i}$ is the salary of $\displaystyle i$-th courier. $\displaystyle d_{j} ,\ j\in \{1,\dotsc ,N\}$ is the demand of $\displaystyle j$-th point, $\displaystyle N$ is the total number of points and $\displaystyle l_{i}$ is the capacity of $\displaystyle i$-th courier. Let's also define the set of feasible solutions $\displaystyle S$ containing vectors $ \overline{p} =( p_{i} ,\ldots ,p_{c})$ which satisfy conditions
 
-1. $ \sum _{j=1}^{t_{i}} d_{p_{i}^{j}} \leqslant l_{i} ,\ \forall i\in \{1,\dotsc ,c\}$ which means that courier can fulfill demands of all points which he visit,
+1. $ \sum_{j=1}^{t_{i}} d_{p_{i}^{j}} \leqslant l_{i} ,\ \forall i\in \{1,\ldots ,c\}$ which means that courier can fulfill demands of all points which he visit,
 
-2. $ \forall j\in \{1,\dotsc ,N\} \ d_{j}  >0\Rightarrow \ \exists i\in \{1,\dotsc ,c\} :\ j\in p_{i}$ which means that for non-zero demand points exists courier which will visit this point.
+2. $ \forall j\in \{1,\ldots ,N\} \ d_{j}  >0\Rightarrow \ \exists i\in \{1,\ldots ,c\} :\ j\in p_{i}$ which means that for non-zero demand points exists courier which will visit this point.
 
 So, our task is to find $ \min_{\overline{p} \in S}\sum _{i=1}^{c}\left(\sum _{j=1}^{t_{i}} m_{p_{i}^{j-1}}^{p_{i}^{j}} \cdotp s_{i}\right) +m_{p_{i}^{t_{i}}}^{p^{0}} \cdotp s_{i}$.
 
